@@ -13,32 +13,28 @@ const WIDTH_OF_COLUMN = 216;
 const PictureList: React.FC = () => {
   const { data } = useQuery('pictures', () => pictureRepository.findAll(0));
 
-  const pictureListElement = useMemo<JSX.Element[]>(() => {
-    if (!data) return [];
-
-    return data.map((picture, i) => {
-      const xPos = (i % COLUMNS_PER_ROW) * WIDTH_OF_COLUMN;
-      const yPos = data
-        .slice(0, i + 1)
-        .reverse()
-        .reduce((acc, picture, j) => {
-          if (j % COLUMNS_PER_ROW === 0 && j > 0) {
-            acc += Number(picture.fixed_width.height) + 32;
-          }
-          return acc;
-        }, 0);
-
-      return (
-        <Wrapper key={picture.id} xPos={xPos} yPos={yPos}>
-          <PictureItem picture={picture} />
-        </Wrapper>
-      );
-    });
-  }, [data]);
-
   if (!data) {
     return null;
   }
+
+  const pictureListElement: JSX.Element[] = data.map((picture, i) => {
+    const xPos = (i % COLUMNS_PER_ROW) * WIDTH_OF_COLUMN;
+    const yPos = data
+      .slice(0, i + 1)
+      .reverse()
+      .reduce((acc, picture, j) => {
+        if (j % COLUMNS_PER_ROW === 0 && j > 0) {
+          acc += Number(picture.fixed_width.height) + 32;
+        }
+        return acc;
+      }, 0);
+
+    return (
+      <Wrapper key={picture.id} xPos={xPos} yPos={yPos}>
+        <PictureItem picture={picture} />
+      </Wrapper>
+    );
+  });
 
   return <Container>{pictureListElement}</Container>;
 };
