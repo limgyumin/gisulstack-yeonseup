@@ -41,4 +41,4 @@ export const theme = {
   medias,
 };
 
-export type Theme = typeof theme;
+export type CustomTheme = typeof theme;

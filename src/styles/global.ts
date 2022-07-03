@@ -32,8 +32,11 @@ export const globalStyles = css`
   body {
     width: 100%;
     height: 100%;
-    line-height: 1.4;
     font-family: 'Interop';
+  }
+
+  div {
+    line-height: 0;
   }
 
   #root {
