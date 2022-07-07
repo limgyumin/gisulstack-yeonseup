@@ -12,6 +12,7 @@ type Images = {
 export type PictureAttributes = Readonly<{
   id: string;
   url: string;
+  username?: string;
   title: string;
   images: Images;
 }>;
@@ -19,16 +20,18 @@ export type PictureAttributes = Readonly<{
 class Picture {
   readonly id: string;
   readonly url: string;
+  readonly username?: string;
   readonly title: string;
   readonly original: Image;
-  readonly fixed_width: Image;
+  readonly fixedWidth: Image;
 
   constructor(picture: PictureAttributes) {
     this.id = picture.id;
     this.url = picture.url;
+    this.username = picture.username;
     this.title = picture.title;
     this.original = picture.images.original;
-    this.fixed_width = picture.images.fixed_width;
+    this.fixedWidth = picture.images.fixed_width;
   }
 
   static createInstance(picture: PictureAttributes): Picture {

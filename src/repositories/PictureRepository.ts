@@ -11,15 +11,28 @@ type Pagination = {
   total_count: number;
 };
 
-type FetchPicturesResponse = {
+type FindAllPicturesResponse = {
   data: PictureAttributes[];
   pagination: Pagination;
+};
+
+type FindPictureResponse = {
+  data: PictureAttributes;
 };
 
 const PICTURES_PER_REQUEST = 30;
 
 class PictureRepository {
   constructor(private readonly requestStrategy: RequestStrategy) {}
+
+  async findOneById(id: string): Promise<Picture> {
+    const { data } = await this.requestStrategy.request<FindPictureResponse>(
+      'get',
+      `/gifs/${id}`,
+    );
+
+    return Picture.createInstance(data);
+  }
 
   async findAll(
     offset: number,
@@ -30,10 +43,8 @@ class PictureRepository {
       .attach('limit', limit)
       .get();
 
-    const { data } = await this.requestStrategy.request<FetchPicturesResponse>(
-      'get',
-      url,
-    );
+    const { data } =
+      await this.requestStrategy.request<FindAllPicturesResponse>('get', url);
 
     return data.map(Picture.createInstance);
   }
