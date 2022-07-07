@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 import Picture from 'models/Picture';
@@ -8,23 +11,48 @@ type Props = {
 };
 
 const PictureItem: React.FC<Props> = ({ picture }) => {
-  const { fixed_width } = picture;
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const { id, fixedWidth } = picture;
+
+  const handleLoadingComplete = () => setLoading(false);
 
   return (
-    <Container>
-      <Image
-        width={fixed_width.width}
-        height={fixed_width.height}
-        src={fixed_width.url}
-        alt={fixed_width.url}
-      />
-    </Container>
+    <Link href={`/pictures?id=${id}`} as={`/pictures/${id}`} scroll={false}>
+      <Container
+        css={css`
+          width: ${fixedWidth.width}px;
+          height: ${fixedWidth.height}px;
+        `}
+      >
+        {loading && <ImageSkeleton />}
+
+        <Image
+          src={fixedWidth.url}
+          alt={fixedWidth.url}
+          layout="fill"
+          hidden={loading}
+          onLoadingComplete={handleLoadingComplete}
+        />
+      </Container>
+    </Link>
   );
 };
 
-const Container = styled.div`
+const Container = styled.a`
+  display: block;
+  position: relative;
   border-radius: 0.5rem;
   overflow: hidden;
+  cursor: pointer;
+`;
+
+const ImageSkeleton = styled.div`
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background-color: ${({ theme }) => theme.colors.gray100};
 `;
 
 export default PictureItem;
