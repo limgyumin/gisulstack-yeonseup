@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQuery } from 'react-query';
 import Image from 'next/image';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -7,8 +6,9 @@ import styled from '@emotion/styled';
 import Button from 'components/common/Button';
 import GiphyIcon from 'components/common/icons/GiphyIcon';
 
-import pictureRepository from 'repositories/PictureRepository';
-import Picture from 'models/Picture';
+import { PICTURE_MODAL_HEIGHT, PICTURE_MODAL_WIDTH } from 'constants/pictures';
+
+import usePictureDetailQuery from 'utils/hooks/usePictureDetailQuery';
 
 type Props = {
   pictureId: string;
@@ -17,25 +17,27 @@ type Props = {
 const PictureDetail: React.FC<Props> = ({ pictureId }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
-  const { isLoading, data } = useQuery<Picture>('picture', () =>
-    pictureRepository.findOneById(pictureId),
-  );
+  const { isLoading, data } = usePictureDetailQuery(pictureId);
 
   const handleLoadingComplete = () => setLoading(false);
 
   if (isLoading) {
+    // need loading component
     return <div></div>;
   }
 
   if (data == null) {
+    // need empty component
     return <div></div>;
   }
 
   const { username, title, url, original } = data;
 
-  const height = (Number(original.height) * 350) / Number(original.width);
+  const height =
+    (Number(original.height) * (PICTURE_MODAL_WIDTH / 2)) /
+    Number(original.width);
 
-  const isFullHeight = height >= 350;
+  const isFullHeight = height >= PICTURE_MODAL_HEIGHT;
 
   return (
     <Container>
