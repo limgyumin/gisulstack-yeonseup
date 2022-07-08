@@ -1,14 +1,23 @@
 import { PropsWithChildren, useEffect } from 'react';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 import Portal from '../Portal';
 
 type Props = PropsWithChildren<{
+  width?: number;
+  height?: number;
   open: boolean;
   onOverlayClick?: () => void;
 }>;
 
-const Modal: React.FC<Props> = ({ open, children, onOverlayClick }) => {
+const Modal: React.FC<Props> = ({
+  width = 500,
+  height = 300,
+  open,
+  children,
+  onOverlayClick,
+}) => {
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : 'unset';
   }, [open]);
@@ -19,8 +28,14 @@ const Modal: React.FC<Props> = ({ open, children, onOverlayClick }) => {
     <Portal>
       <Container>
         <Wrapper>
-          <Content>{children}</Content>
-
+          <Content
+            css={css`
+              width: ${width}px;
+              min-height: ${height}px;
+            `}
+          >
+            {children}
+          </Content>
           <Overlay onClick={onOverlayClick} />
         </Wrapper>
       </Container>
@@ -57,8 +72,6 @@ const Overlay = styled.div`
 
 const Content = styled.div`
   z-index: 1;
-  width: 43.75rem;
-  min-height: 21.875rem;
   background-color: ${({ theme }) => theme.colors.white};
   -webkit-box-shadow: 0px 0px 28px 1px rgba(0, 0, 0, 0.4);
   box-shadow: 0px 0px 28px 1px rgba(0, 0, 0, 0.4);
