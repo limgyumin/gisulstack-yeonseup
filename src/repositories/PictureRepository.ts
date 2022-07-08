@@ -5,6 +5,8 @@ import UrlParamBuilder from 'libs/request/UrlParamBuilder';
 
 import Picture, { PictureAttributes } from 'models/Picture';
 
+import { PICTURES_PER_REQUEST } from 'constants/pictures';
+
 type Pagination = {
   count: number;
   offset: number;
@@ -20,7 +22,11 @@ type FindPictureResponse = {
   data: PictureAttributes;
 };
 
-const PICTURES_PER_REQUEST = 30;
+export type PicturesWithPagination = {
+  pictures: Picture[];
+  next: number;
+  totalCount: number;
+};
 
 class PictureRepository {
   constructor(private readonly requestStrategy: RequestStrategy) {}
@@ -35,18 +41,24 @@ class PictureRepository {
   }
 
   async findAll(
-    offset: number,
+    offset: number = 0,
     limit = PICTURES_PER_REQUEST,
-  ): Promise<Picture[]> {
+  ): Promise<PicturesWithPagination> {
     const url = new UrlParamBuilder('/gifs/trending')
       .attach('offset', offset)
       .attach('limit', limit)
       .get();
 
-    const { data } =
+    const { data, pagination } =
       await this.requestStrategy.request<FindAllPicturesResponse>('get', url);
 
-    return data.map(Picture.createInstance);
+    const pictures = data.map(Picture.createInstance);
+
+    return {
+      pictures,
+      next: pagination.offset + PICTURES_PER_REQUEST,
+      totalCount: pagination.total_count,
+    };
   }
 }
 
